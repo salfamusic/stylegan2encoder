@@ -71,7 +71,7 @@ class Projector:
             self._Gs = self._Gs.clone()
 
         # Find dlatent stats.
-        if dlatent_avg_fname is None:
+        if self.dlatent_avg_fname is None:
             self._info('Finding W midpoint and stddev using %d samples...' % self.dlatent_avg_samples)
             latent_samples = np.random.RandomState(123).randn(self.dlatent_avg_samples, *self._Gs.input_shapes[0][1:])
             dlatent_samples = self._Gs.components.mapping.run(latent_samples, None) # [N, 18, 512]
