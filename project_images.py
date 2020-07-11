@@ -86,6 +86,7 @@ def main():
     parser.add_argument('--num-steps', type=int, default=1000, help='Number of optimization steps')
     parser.add_argument('--initial-learning-rate', type=float, default=0.1, help='Initial learning rate')
     parser.add_argument('--initial-noise-factor', type=float, default=0.05, help='Initial noise factor')
+    parser.add_argument('--dlatent_avg_fname', default=None, help='Fname for dlatnt avg')
     parser.add_argument('--verbose', type=bool, default=False, help='Verbose output')
     parser.add_argument('--video', type=bool, default=False, help='Render video of the optimization process')
     parser.add_argument('--video-mode', type=int, default=1, help='Video mode: 1 for optimization only, 2 for source + optimization')
@@ -102,7 +103,8 @@ def main():
         num_steps             = args.num_steps,
         initial_learning_rate = args.initial_learning_rate,
         initial_noise_factor  = args.initial_noise_factor,
-        verbose               = args.verbose
+        verbose               = args.verbose,
+        dlatent_avg_fname     = args.dlatent_avg_fname
     )
     proj.set_network(Gs)
 

@@ -19,7 +19,7 @@ class Projector:
         num_steps                       = 1000,
         initial_learning_rate           = 0.1,
         initial_noise_factor            = 0.05,
-        verbose                         = True,
+        verbose                         = False,
         dlatent_avg_fname               = None
     ):
 
@@ -79,7 +79,7 @@ class Projector:
         else:
             latent_samples = np.random.RandomState(123).randn(1, *self._Gs.input_shapes[0][1:])
             dlatent_samples = self._Gs.components.mapping.run(latent_samples, None) # [N, 18, 512]
-            
+
             self._dlatent_avg = np.reshape(np.load(self.dlatent_avg_fname), dlatent_samples.shape)
         self._dlatent_std = (np.sum((dlatent_samples - self._dlatent_avg) ** 2) / self.dlatent_avg_samples) ** 0.5
         self._info('std = %g' % self._dlatent_std)
