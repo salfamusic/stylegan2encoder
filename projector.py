@@ -19,7 +19,8 @@ class Projector:
         num_steps                       = 1000,
         initial_learning_rate           = 0.1,
         initial_noise_factor            = 0.05,
-        verbose                         = False
+        verbose                         = True,
+        dlatent_avg_fname               = None
     ):
 
         self.vgg16_pkl                  = vgg16_pkl
@@ -33,6 +34,7 @@ class Projector:
         self.regularize_noise_weight    = 1e5
         self.verbose                    = verbose
         self.clone_net                  = True
+        self.dlatent_avg_fname          = dlatent_avg_fname
 
         self._Gs                    = None
         self._minibatch_size        = None
@@ -69,10 +71,16 @@ class Projector:
             self._Gs = self._Gs.clone()
 
         # Find dlatent stats.
-        self._info('Finding W midpoint and stddev using %d samples...' % self.dlatent_avg_samples)
-        latent_samples = np.random.RandomState(123).randn(self.dlatent_avg_samples, *self._Gs.input_shapes[0][1:])
-        dlatent_samples = self._Gs.components.mapping.run(latent_samples, None) # [N, 18, 512]
-        self._dlatent_avg = np.mean(dlatent_samples, axis=0, keepdims=True) # [1, 18, 512]
+        if dlatent_avg_fname is None:
+            self._info('Finding W midpoint and stddev using %d samples...' % self.dlatent_avg_samples)
+            latent_samples = np.random.RandomState(123).randn(self.dlatent_avg_samples, *self._Gs.input_shapes[0][1:])
+            dlatent_samples = self._Gs.components.mapping.run(latent_samples, None) # [N, 18, 512]
+            self._dlatent_avg = np.mean(dlatent_samples, axis=0, keepdims=True) # [1, 18, 512]
+        else:
+            latent_samples = np.random.RandomState(123).randn(1, *self._Gs.input_shapes[0][1:])
+            dlatent_samples = self._Gs.components.mapping.run(latent_samples, None) # [N, 18, 512]
+            
+            self._dlatent_avg = np.reshape(np.load(self.dlatent_avg_fname), dlatent_samples.shape)
         self._dlatent_std = (np.sum((dlatent_samples - self._dlatent_avg) ** 2) / self.dlatent_avg_samples) ** 0.5
         self._info('std = %g' % self._dlatent_std)
 
